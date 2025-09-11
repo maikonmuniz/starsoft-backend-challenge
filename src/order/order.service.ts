@@ -12,7 +12,9 @@ export class OrderService {
         @InjectRepository(Order)
         private orderRepository: Repository<Order>,
         @Inject("order_created")
-        private kafkaClient: ClientKafka
+        private kafkaClient: ClientKafka,
+        @Inject('order_status_updated')
+        private orderUpdatedKafka: ClientKafka,
   ) {}
 
   async register(orderData: Partial<Order>): Promise<Order> {
@@ -23,5 +25,17 @@ export class OrderService {
     const convertCretedOrderString = JSON.stringify(createdOrder)
     await lastValueFrom(this.kafkaClient.emit('orders', convertCretedOrderString))
     return createdOrder;
+  }
+
+  async update(orderData: Partial<Order>): Promise<Order> {
+    if (!orderData.id) throw new BadRequestException('O parâmetro id é obrigatório');
+    const existingOrder = await this.orderRepository.findOne({ where: { id: orderData.id } });
+    if (!existingOrder) throw new BadRequestException(`Pedido com id ${orderData.id} não encontrado`);
+    const updatedOrder = this.orderRepository.merge(existingOrder, orderData);
+    const savedOrder = await this.orderRepository.save(updatedOrder);
+    if (!savedOrder) throw new BadRequestException('Falha ao atualizar no banco de dados!');
+    const orderString = JSON.stringify(savedOrder);
+    await lastValueFrom(this.orderUpdatedKafka.emit('orders-updated', orderString));
+    return savedOrder;
   }
 }
