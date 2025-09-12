@@ -5,6 +5,7 @@ import { Order } from '../../infra/database/order.entity';
 import { BadRequestException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { ClientKafka } from '@nestjs/microservices';
+import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { of } from 'rxjs';
 
 describe('OrderService - register', () => {
@@ -12,6 +13,7 @@ describe('OrderService - register', () => {
   let repository: jest.Mocked<Repository<Order>>;
   let orderCreatedKafka: jest.Mocked<ClientKafka>;
   let orderUpdatedKafka: jest.Mocked<ClientKafka>;
+  let elasticsearchService: ElasticsearchService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -22,8 +24,6 @@ describe('OrderService - register', () => {
           useValue: {
             create: jest.fn(),
             save: jest.fn(),
-            findOne: jest.fn(),
-            merge: jest.fn(),
           },
         },
         {
@@ -38,6 +38,12 @@ describe('OrderService - register', () => {
             emit: jest.fn().mockReturnValue(of(null)),
           },
         },
+        {
+          provide: ElasticsearchService,
+          useValue: {
+            index: jest.fn().mockResolvedValue(null),
+          },
+        },
       ],
     }).compile();
 
@@ -45,12 +51,15 @@ describe('OrderService - register', () => {
     repository = module.get(getRepositoryToken(Order));
     orderCreatedKafka = module.get('order_created');
     orderUpdatedKafka = module.get('order_status_updated');
+    elasticsearchService = module.get(ElasticsearchService);
   });
 
   it('should throw an exception if description is missing', async () => {
     const orderData: Partial<Order> = {};
     await expect(service.register(orderData)).rejects.toThrow(BadRequestException);
-    await expect(service.register(orderData)).rejects.toThrow('O parâmetro id é obrigatório');
+    await expect(service.register(orderData)).rejects.toThrow(
+      'O parâmetro description é obrigatório'
+    );
   });
 
   it('should throw an exception if save returns null', async () => {
@@ -64,7 +73,7 @@ describe('OrderService - register', () => {
     await expect(service.register(orderData)).rejects.toThrow('No register in database!');
   });
 
-  it('should create and save the order and emit a Kafka event', async () => {
+  it('should create, save, emit Kafka event, and index in Elasticsearch', async () => {
     const orderData: Partial<Order> = { description: 'valid order' };
     const orderEntity: Order = { id: 1, description: 'valid order' } as Order;
 
@@ -77,8 +86,13 @@ describe('OrderService - register', () => {
     expect(repository.save).toHaveBeenCalledWith(orderEntity);
     expect(orderCreatedKafka.emit).toHaveBeenCalledWith(
       'orders',
-      JSON.stringify(orderEntity),
+      JSON.stringify(orderEntity)
     );
+    expect(elasticsearchService.index).toHaveBeenCalledWith({
+      index: 'orders',
+      id: orderEntity.id.toString(),
+      document: orderEntity,
+    });
     expect(result).toEqual(orderEntity);
   });
 });
