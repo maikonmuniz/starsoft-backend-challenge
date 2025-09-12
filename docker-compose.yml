@@ -15,6 +15,7 @@ services:
     depends_on:
       - db
       - kafka
+      - elasticsearch
     environment:
       DATABASE_HOST: db
       DATABASE_PORT: 5432
@@ -24,6 +25,7 @@ services:
       KAFKA_BROKER: kafka:29092
     networks:
       - app-net
+      - rede-elastic-kibana
 
   db:
     image: postgres:15
@@ -159,9 +161,70 @@ services:
     networks:
       - app-net
 
+  elasticsearch:
+    image: elasticsearch:7.17.23
+    container_name: elasticsearch
+    hostname: elasticsearch
+    deploy:
+      resources:
+        limits:
+          cpus: "0.95"
+          memory: 4G
+    restart: always
+    environment:
+      - node.name=elasticsearch
+      - discovery.type=single-node
+      - xpack.security.enabled=true 
+      - cluster.name=docker-cluster
+      - ELASTIC_PASSWORD=${ELASTIC_PASS}
+      - TZ=America/Sao_Paulo
+    healthcheck:
+      test: curl -u elastic:${ELASTIC_PASS} -f http://elasticsearch:9200/_cluster/health || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - elastic_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - rede-elastic-kibana
+
+  kibana:
+    depends_on:
+       - elasticsearch
+    image: kibana:7.17.23
+    container_name: kibana
+    hostname: kibana
+    deploy:
+      resources:
+        limits:
+          cpus: "0.95"
+          memory: 2G
+    restart: always
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=${ELASTIC_PASS}
+      - TZ=America/Sao_Paulo
+    healthcheck:
+      test: curl -f http://kibana:5601/ || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 15s
+    ports:
+      - "5601:5601"
+    networks:
+      - rede-elastic-kibana
+
 volumes:
   postgres_data:
+  elastic_data:
 
 networks:
   app-net:
+    driver: bridge
+  rede-elastic-kibana:
     driver: bridge
