@@ -5,6 +5,7 @@ import { Order } from '../../infra/database/order.entity';
 import { BadRequestException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { ClientKafka } from '@nestjs/microservices';
+import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { of } from 'rxjs';
 
 describe('OrderService - update', () => {
@@ -22,20 +23,19 @@ describe('OrderService - update', () => {
             findOne: jest.fn(),
             merge: jest.fn(),
             save: jest.fn(),
-            create: jest.fn(),
           },
         },
         {
           provide: 'order_created',
-          useValue: {
-            emit: jest.fn().mockReturnValue(of(null)),
-          },
+          useValue: { emit: jest.fn().mockReturnValue(of(null)) },
         },
         {
           provide: 'order_status_updated',
-          useValue: {
-            emit: jest.fn().mockReturnValue(of(null)),
-          },
+          useValue: { emit: jest.fn().mockReturnValue(of(null)) },
+        },
+        {
+          provide: ElasticsearchService,
+          useValue: { index: jest.fn().mockResolvedValue(null) },
         },
       ],
     }).compile();
@@ -48,7 +48,9 @@ describe('OrderService - update', () => {
   it('should throw exception if id is not given', async () => {
     const orderData: Partial<Order> = { description: 'teste' };
     await expect(service.update(orderData)).rejects.toThrow(BadRequestException);
-    await expect(service.update(orderData)).rejects.toThrow('O parâmetro id é obrigatório');
+    await expect(service.update(orderData)).rejects.toThrow(
+      'O parâmetro id é obrigatório'
+    );
   });
 
   it('should throw exception if order is not found', async () => {
@@ -56,7 +58,9 @@ describe('OrderService - update', () => {
     repository.findOne.mockResolvedValue(null);
 
     await expect(service.update(orderData)).rejects.toThrow(BadRequestException);
-    await expect(service.update(orderData)).rejects.toThrow('Pedido com id 1 não encontrado');
+    await expect(service.update(orderData)).rejects.toThrow(
+      'Pedido com id 1 não encontrado'
+    );
   });
 
   it('should throw exception if save fails', async () => {
@@ -68,7 +72,9 @@ describe('OrderService - update', () => {
     repository.save.mockResolvedValue(null as any);
 
     await expect(service.update(orderData)).rejects.toThrow(BadRequestException);
-    await expect(service.update(orderData)).rejects.toThrow('Falha ao atualizar no banco de dados!');
+    await expect(service.update(orderData)).rejects.toThrow(
+      'Falha ao atualizar no banco de dados!'
+    );
   });
 
   it('should update the order and emit Kafka event', async () => {
@@ -87,7 +93,7 @@ describe('OrderService - update', () => {
     expect(repository.save).toHaveBeenCalledWith(savedOrder);
     expect(orderUpdatedKafka.emit).toHaveBeenCalledWith(
       'orders-updated',
-      JSON.stringify(savedOrder),
+      JSON.stringify(savedOrder)
     );
     expect(result).toEqual(savedOrder);
   });
