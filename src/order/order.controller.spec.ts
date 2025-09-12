@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { OrderController } from './order.controller';
 import { OrderService } from './order.service';
 import { BadRequestException } from '@nestjs/common';
+import { OrderDto } from '../dto/order.dto';
 
 describe('OrderController', () => {
   let controller: OrderController;
@@ -28,8 +29,8 @@ describe('OrderController', () => {
   });
 
   it('should call OrderService.register with the request body', async () => {
-    const body = { description: 'Test order' };
-    const expected = { id: 1, description: 'Test order' };
+    const body: OrderDto = {description: 'Test order',  "items": [ {"price": 30} ]};
+    const expected = { description: 'Test order',  "items": [ {"price": 30} ], "status": "pendente"};
 
     mockOrderService.register.mockResolvedValue(expected);
 
@@ -40,7 +41,7 @@ describe('OrderController', () => {
   });
 
   it('should throw BadRequestException if service throws it', async () => {
-    const body = {};
+    const body: OrderDto | any = {};
     mockOrderService.register.mockRejectedValue(
       new BadRequestException('The parameter "description" is required'),
     );
