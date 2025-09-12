@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { BadRequestException } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
+import { ElasticsearchService } from '@nestjs/elasticsearch';
 
 @Injectable()
 export class OrderService {
@@ -15,15 +16,21 @@ export class OrderService {
         private kafkaClient: ClientKafka,
         @Inject('order_status_updated')
         private orderUpdatedKafka: ClientKafka,
+        private readonly elasticsearchService: ElasticsearchService,
   ) {}
 
   async register(orderData: Partial<Order>): Promise<Order> {
-    if (!orderData.description) throw new BadRequestException('O parâmetro id é obrigatório');
+    if (!orderData.description) throw new BadRequestException('O parâmetro description é obrigatório');
     const order = this.orderRepository.create(orderData);
-    const createdOrder = await this.orderRepository.save(order)
-    if(!createdOrder) throw new BadRequestException('No register in database!');
-    const convertCretedOrderString = JSON.stringify(createdOrder)
-    await lastValueFrom(this.kafkaClient.emit('orders', convertCretedOrderString))
+    const createdOrder = await this.orderRepository.save(order);
+    if (!createdOrder) throw new BadRequestException('No register in database!');
+    const convertCretedOrderString = JSON.stringify(createdOrder);
+    await lastValueFrom(this.kafkaClient.emit('orders', convertCretedOrderString));
+    await this.elasticsearchService.index({
+      index: 'orders',
+      id: createdOrder.id.toString(),
+      document: createdOrder,
+    });
     return createdOrder;
   }
 
@@ -37,5 +44,14 @@ export class OrderService {
     const orderString = JSON.stringify(savedOrder);
     await lastValueFrom(this.orderUpdatedKafka.emit('orders-updated', orderString));
     return savedOrder;
+  }
+
+  async findOne(id: number) {
+    if (!id) throw new BadRequestException("O parametro id está vazio!")
+    let result = await this.elasticsearchService.get({
+      index: 'orders',
+      id: id.toString(),
+    });
+    return result._source
   }
 }
