@@ -81,4 +81,16 @@ export class OrderService {
 
     return result.hits.hits.map((hit: any) => hit._source);
   }
+
+  async delete(id: number): Promise<{ message: string }> {
+    if (!id) throw new BadRequestException('O parâmetro id é obrigatório');
+    const existingOrder = await this.orderRepository.findOne({ where: { id } });
+    if (!existingOrder) throw new BadRequestException(`Pedido com id ${id} não encontrado`);
+    await this.orderRepository.delete(id);
+    await this.elasticsearchService.delete({
+      index: 'orders',
+      id: id.toString(),
+    });
+    return { message: `Pedido com id ${id} deletado com sucesso.` };
+  }
 }
