@@ -12,6 +12,7 @@ describe('OrderController', () => {
     register: jest.fn(),
     update: jest.fn(),
     find: jest.fn(),
+    delete: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -97,5 +98,27 @@ describe('OrderController', () => {
 
     await expect(controller.find(id)).rejects.toThrow(BadRequestException);
     await expect(controller.find(id)).rejects.toThrow('Pedido não encontrado');
+  });
+
+  it('should call OrderService.delete with the correct id', async () => {
+    const id = 1;
+    const expected = { message: 'Pedido deletado com sucesso' };
+
+    mockOrderService.delete.mockResolvedValue(expected);
+
+    const result = await controller.delete(id);
+
+    expect(service.delete).toHaveBeenCalledWith(id);
+    expect(result).toEqual(expected);
+  });
+
+  it('should throw BadRequestException if delete throws it', async () => {
+    const id = 2;
+    mockOrderService.delete.mockRejectedValue(
+      new BadRequestException('Falha ao deletar pedido')
+    );
+
+    await expect(controller.delete(id)).rejects.toThrow(BadRequestException);
+    await expect(controller.delete(id)).rejects.toThrow('Falha ao deletar pedido');
   });
 });
