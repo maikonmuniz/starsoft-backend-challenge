@@ -16,6 +16,7 @@ services:
       - db
       - kafka
       - elasticsearch
+      - logstash
     environment:
       DATABASE_HOST: db
       DATABASE_PORT: 5432
@@ -217,6 +218,24 @@ services:
     ports:
       - "5601:5601"
     networks:
+      - rede-elastic-kibana
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.17.23
+    container_name: logstash
+    depends_on:
+      - kafka
+      - elasticsearch
+    ports:
+      - "5044:5044"
+      - "9600:9600"
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
+    environment:
+      - LS_JAVA_OPTS=-Xms512m -Xmx512m
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    networks:
+      - app-net
       - rede-elastic-kibana
 
 volumes:
