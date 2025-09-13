@@ -21,6 +21,12 @@ export class OrderService {
 
   async register(orderData: Partial<Order>): Promise<Order> {
     if (!orderData.description) throw new BadRequestException('O parâmetro description é obrigatório');
+    if (!orderData.items) throw new BadRequestException('O parâmetro items é obrigatório');
+    if (!orderData.quantity) throw new BadRequestException('O parâmetro quantity é obrigatório');
+    const quantityItems = orderData.items.length
+    const quantity = orderData.quantity
+    const validationQuantityAndItems = quantityItems == quantity;
+    if (!validationQuantityAndItems) throw new BadRequestException('Divergência na quantidade e nos itens!');
     const order = this.orderRepository.create(orderData);
     const createdOrder = await this.orderRepository.save(order);
     if (!createdOrder) throw new BadRequestException('No register in database!');
