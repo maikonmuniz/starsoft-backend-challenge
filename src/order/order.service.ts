@@ -46,12 +46,34 @@ export class OrderService {
     return savedOrder;
   }
 
-  async findOne(id: number) {
-    if (!id) throw new BadRequestException("O parametro id está vazio!")
-    let result = await this.elasticsearchService.get({
+  async find(id?: string, status?: string, data?: string) {
+    const filters: any[] = [];
+
+    if (id) {
+      filters.push({ term: { id: id } });
+    }
+
+    if (status) {
+      filters.push({ term: { status: status } });
+    }
+
+    if (data) {
+      filters.push({ range: { createdAt: { gte: data } } });
+    }
+
+    if (filters.length === 0) throw new BadRequestException("É necessário informar pelo menos um filtro (id, status ou data)!");
+  
+    const result = await this.elasticsearchService.search<any>({
       index: 'orders',
-      id: id.toString(),
+      body: {
+        query: {
+          bool: {
+            must: filters,
+          },
+        },
+      } as any,
     });
-    return result._source
+
+    return result.hits.hits.map((hit: any) => hit._source);
   }
 }
