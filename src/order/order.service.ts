@@ -43,6 +43,11 @@ export class OrderService {
     if (!savedOrder) throw new BadRequestException('Falha ao atualizar no banco de dados!');
     const orderString = JSON.stringify(savedOrder);
     await lastValueFrom(this.orderUpdatedKafka.emit('orders-updated', orderString));
+    await this.elasticsearchService.index({
+      index: 'orders',
+      id: savedOrder.id.toString(),
+      document: savedOrder,
+    });
     return savedOrder;
   }
 
