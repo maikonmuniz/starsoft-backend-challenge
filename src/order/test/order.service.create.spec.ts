@@ -55,16 +55,40 @@ describe('OrderService - register', () => {
   });
 
   it('should throw an exception if description is missing', async () => {
-    const orderData: Partial<Order> = {};
+    const orderData: Partial<Order> = { quantity:3 }
     await expect(service.register(orderData)).rejects.toThrow(BadRequestException);
     await expect(service.register(orderData)).rejects.toThrow(
       'O parâmetro description é obrigatório'
     );
   });
 
+  it('should throw an exception if items is missing', async () => {
+    const orderData: Partial<Order> = {description: 'Test order', quantity: 1};
+    await expect(service.register(orderData)).rejects.toThrow(BadRequestException);
+    await expect(service.register(orderData)).rejects.toThrow(
+      'O parâmetro items é obrigatório'
+    );
+  });
+
+  it('should throw an exception if quantity is missing', async () => {
+    const orderData: Partial<Order> = {description: 'Test order', items: [{ price: 30 }]};
+    await expect(service.register(orderData)).rejects.toThrow(BadRequestException);
+    await expect(service.register(orderData)).rejects.toThrow(
+      'O parâmetro quantity é obrigatório'
+    );
+  });
+
+    it('should throw an error if quantity and items do not match', async () => {
+    const orderData: Partial<Order> = {description: 'Test order', items: [{ price: 30 }], quantity: 2};
+    await expect(service.register(orderData)).rejects.toThrow(BadRequestException);
+    await expect(service.register(orderData)).rejects.toThrow(
+      'Divergência na quantidade e nos itens!'
+    );
+  });
+
   it('should throw an exception if save returns null', async () => {
-    const orderData: Partial<Order> = { description: 'new order' };
-    const orderEntity: Order = { id: 1, description: 'new order' } as Order;
+    const orderData: Partial<Order> = { description: 'Test order', items: [{ price: 30 }], quantity: 1 };
+    const orderEntity: Order = { id: 1, description: 'new order', items: [{ price: 30 }], quantity: 1 } as Order;
 
     repository.create.mockReturnValue(orderEntity);
     repository.save.mockResolvedValue(null as any);
@@ -74,8 +98,8 @@ describe('OrderService - register', () => {
   });
 
   it('should create, save, emit Kafka event, and index in Elasticsearch', async () => {
-    const orderData: Partial<Order> = { description: 'valid order' };
-    const orderEntity: Order = { id: 1, description: 'valid order' } as Order;
+    const orderData: Partial<Order> = { description: 'Test order', items: [{ price: 30 }], quantity: 1 };
+    const orderEntity: Order = { id: 1, description: 'Test order', items: [{ price: 30 }], quantity: 1 } as Order;
 
     repository.create.mockReturnValue(orderEntity);
     repository.save.mockResolvedValue(orderEntity);
