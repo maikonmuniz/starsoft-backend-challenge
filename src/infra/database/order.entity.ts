@@ -20,6 +20,9 @@ export class Order {
   @OneToMany(() => Item, (item) => item.order, { cascade: true })
   items: Item[];
 
+  @Column()
+  quantity?: number;
+
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 

@@ -18,6 +18,9 @@ export class OrderDto {
     @ApiProperty({ example: '[{ "price": 30.00 }]', description: 'list itens' })
     items: ItemDto[];
 
+    @ApiProperty({ example: '3', description: 'quantity itens' })
+    quantity: number
+
     @ApiPropertyOptional({ example: "pendente", description: 'status the order' })
     status?: OrderStatus;
 }

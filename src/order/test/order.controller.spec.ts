@@ -32,7 +32,7 @@ describe('OrderController', () => {
   });
 
   it('should call OrderService.register with the request body', async () => {
-    const body: OrderDto = { description: 'Test order', items: [{ price: 30 }] };
+    const body: OrderDto = { description: 'Test order', items: [{ price: 30 }], quantity:3 };
     const expected = { description: 'Test order', items: [{ price: 30 }], status: 'pendente' };
 
     mockOrderService.register.mockResolvedValue(expected);
@@ -56,7 +56,7 @@ describe('OrderController', () => {
   });
 
   it('should call OrderService.update with the request body', async () => {
-    const body: OrderDto = { id: 1, description: 'Updated order', items: [{ price: 50 }] };
+    const body: OrderDto = { id: 1, description: 'Updated order', items: [{ price: 50 }], quantity: 3 };
     const expected = { id: 1, description: 'Updated order', items: [{ price: 50 }], status: 'atualizado' };
 
     mockOrderService.update.mockResolvedValue(expected);
