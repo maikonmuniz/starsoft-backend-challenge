@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { OrderService } from './order.service';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { OrderDto } from '../dto/order.dto';
 
 @ApiTags('order')
@@ -23,10 +23,21 @@ export class OrderController {
     return this.orderService.update(body);
   }
 
-  @Get('find/:id')
-  @ApiOperation({ summary: 'Faz consulta de pedido pelo ID.' })
+  @Get('find')
+  @ApiOperation({ summary: 'Faz consulta de pedido por filtros.' })
   @ApiResponse({ status: 200, description: 'Retorna a consulta de pedido.' })
-  async find(@Param('id') id: string) {
-    return this.orderService.findOne(Number(id));
+  @ApiQuery({ name: 'id', required: false, type: String })
+  @ApiQuery({ name: 'status', required: false, type: String })
+  @ApiQuery({ name: 'data', required: false, type: String })
+  async find(
+    @Query('id') id?: string,
+    @Query('status') status?: string,
+    @Query('data') data?: string,
+  ) {
+    return this.orderService.find(
+      id,
+      status,
+      data
+    );
   }
 }
