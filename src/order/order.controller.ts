@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, Delete } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { OrderDto } from '../dto/order.dto';
@@ -39,5 +39,12 @@ export class OrderController {
       status,
       data
     );
+  }
+
+  @Delete('delete/:id')
+  @ApiOperation({ summary: 'Deleta um pedido pelo ID.' })
+  @ApiResponse({ status: 200, description: 'Pedido deletado com sucesso.' })
+  async delete(@Param('id') id: number) {
+    return this.orderService.delete(id);
   }
 }
