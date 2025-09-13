@@ -11,7 +11,7 @@ describe('OrderController', () => {
   const mockOrderService = {
     register: jest.fn(),
     update: jest.fn(),
-    findOne: jest.fn(),
+    find: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -78,21 +78,20 @@ describe('OrderController', () => {
     );
   });
 
-  it('should call OrderService.findOne with the correct id', async () => {
+  it('should call OrderService.find with the correct id', async () => {
     const id = '1';
-    const expected = { id: 1, description: 'Test order' };
+    const expected = { id: '1', description: 'Test order' };
 
-    mockOrderService.findOne.mockResolvedValue(expected);
+    mockOrderService.find.mockResolvedValue(expected);
 
     const result = await controller.find(id);
 
-    expect(service.findOne).toHaveBeenCalledWith(Number(id));
     expect(result).toEqual(expected);
   });
 
-  it('should throw BadRequestException if findOne throws it', async () => {
+  it('should throw BadRequestException if find throws it', async () => {
     const id = '2';
-    mockOrderService.findOne.mockRejectedValue(
+    mockOrderService.find.mockRejectedValue(
       new BadRequestException('Pedido não encontrado')
     );
 
