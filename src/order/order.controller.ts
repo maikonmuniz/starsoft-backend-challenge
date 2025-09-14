@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, Put, Query, Delete } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  Delete,
+} from '@nestjs/common';
 import { OrderService } from './order.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { OrderDto } from '../dto/order.dto';
@@ -6,14 +15,16 @@ import { OrderDto } from '../dto/order.dto';
 @ApiTags('order')
 @Controller('order')
 export class OrderController {
-
   constructor(private readonly orderService: OrderService) {}
 
-  @Post("create")
+  @Post('create')
   @ApiOperation({ summary: 'Cria pedido e seus itens' })
-  @ApiResponse({ status: 200, description: 'Retorna o pedido e seus itens criados com sucesso.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Retorna o pedido e seus itens criados com sucesso.',
+  })
   create(@Body() body: OrderDto) {
-    return this.orderService.register(body)
+    return this.orderService.register(body);
   }
 
   @Put('update')
@@ -34,14 +45,9 @@ export class OrderController {
     @Query('id') id?: string,
     @Query('status') status?: string,
     @Query('date') date?: string,
-    @Query('quantity') quantity?: number
+    @Query('quantity') quantity?: number,
   ) {
-    return this.orderService.find(
-      id,
-      status,
-      date,
-      quantity
-    );
+    return this.orderService.find(id, status, date, quantity);
   }
 
   @Delete('delete/:id')

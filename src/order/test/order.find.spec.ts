@@ -24,7 +24,9 @@ describe('OrderService - find', () => {
 
   it('deve lançar BadRequestException se nenhum filtro for informado', async () => {
     await expect(orderService.find()).rejects.toThrow(
-      new BadRequestException('É necessário informar pelo menos um filtro (id, status ou data)!'),
+      new BadRequestException(
+        'É necessário informar pelo menos um filtro (id, status ou data)!',
+      ),
     );
   });
 
@@ -32,7 +34,9 @@ describe('OrderService - find', () => {
     const mockResponse = {
       hits: {
         hits: [
-          { _source: { id: '123', status: 'pending', createdAt: '2023-01-01' } },
+          {
+            _source: { id: '123', status: 'pending', createdAt: '2023-01-01' },
+          },
         ],
       },
     };
@@ -52,21 +56,33 @@ describe('OrderService - find', () => {
       },
     });
 
-    expect(result).toEqual([{ id: '123', status: 'pending', createdAt: '2023-01-01' }]);
+    expect(result).toEqual([
+      { id: '123', status: 'pending', createdAt: '2023-01-01' },
+    ]);
   });
 
   it('deve buscar por status e data', async () => {
     const mockResponse = {
       hits: {
         hits: [
-          { _source: { id: '456', status: 'completed', createdAt: '2023-02-01' } },
+          {
+            _source: {
+              id: '456',
+              status: 'completed',
+              createdAt: '2023-02-01',
+            },
+          },
         ],
       },
     };
 
     elasticsearchService.search.mockResolvedValue(mockResponse as any);
 
-    const result = await orderService.find(undefined, 'completed', '2023-01-31');
+    const result = await orderService.find(
+      undefined,
+      'completed',
+      '2023-01-31',
+    );
 
     expect(elasticsearchService.search).toHaveBeenCalledWith({
       index: 'orders',
@@ -82,6 +98,8 @@ describe('OrderService - find', () => {
       },
     });
 
-    expect(result).toEqual([{ id: '456', status: 'completed', createdAt: '2023-02-01' }]);
+    expect(result).toEqual([
+      { id: '456', status: 'completed', createdAt: '2023-02-01' },
+    ]);
   });
 });

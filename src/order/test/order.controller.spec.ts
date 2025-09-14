@@ -32,8 +32,16 @@ describe('OrderController', () => {
   });
 
   it('should call OrderService.register with the request body', async () => {
-    const body: OrderDto = { description: 'Test order', items: [{ price: 30 }], quantity:3 };
-    const expected = { description: 'Test order', items: [{ price: 30 }], status: 'pendente' };
+    const body: OrderDto = {
+      description: 'Test order',
+      items: [{ price: 30 }],
+      quantity: 3,
+    };
+    const expected = {
+      description: 'Test order',
+      items: [{ price: 30 }],
+      status: 'pendente',
+    };
 
     mockOrderService.register.mockResolvedValue(expected);
 
@@ -46,18 +54,28 @@ describe('OrderController', () => {
   it('should throw BadRequestException if register throws it', async () => {
     const body: any = {};
     mockOrderService.register.mockRejectedValue(
-      new BadRequestException('The parameter "description" is required')
+      new BadRequestException('The parameter "description" is required'),
     );
 
     await expect(controller.create(body)).rejects.toThrow(BadRequestException);
     await expect(controller.create(body)).rejects.toThrow(
-      'The parameter "description" is required'
+      'The parameter "description" is required',
     );
   });
 
   it('should call OrderService.update with the request body', async () => {
-    const body: OrderDto = { id: 1, description: 'Updated order', items: [{ price: 50 }], quantity: 3 };
-    const expected = { id: 1, description: 'Updated order', items: [{ price: 50 }], status: 'atualizado' };
+    const body: OrderDto = {
+      id: 1,
+      description: 'Updated order',
+      items: [{ price: 50 }],
+      quantity: 3,
+    };
+    const expected = {
+      id: 1,
+      description: 'Updated order',
+      items: [{ price: 50 }],
+      status: 'atualizado',
+    };
 
     mockOrderService.update.mockResolvedValue(expected);
 
@@ -70,12 +88,12 @@ describe('OrderController', () => {
   it('should throw BadRequestException if update throws it', async () => {
     const body: any = { id: 1 };
     mockOrderService.update.mockRejectedValue(
-      new BadRequestException('Falha ao atualizar no banco de dados!')
+      new BadRequestException('Falha ao atualizar no banco de dados!'),
     );
 
     await expect(controller.update(body)).rejects.toThrow(BadRequestException);
     await expect(controller.update(body)).rejects.toThrow(
-      'Falha ao atualizar no banco de dados!'
+      'Falha ao atualizar no banco de dados!',
     );
   });
 
@@ -93,7 +111,7 @@ describe('OrderController', () => {
   it('should throw BadRequestException if find throws it', async () => {
     const id = '2';
     mockOrderService.find.mockRejectedValue(
-      new BadRequestException('Pedido não encontrado')
+      new BadRequestException('Pedido não encontrado'),
     );
 
     await expect(controller.find(id)).rejects.toThrow(BadRequestException);
@@ -115,10 +133,12 @@ describe('OrderController', () => {
   it('should throw BadRequestException if delete throws it', async () => {
     const id = 2;
     mockOrderService.delete.mockRejectedValue(
-      new BadRequestException('Falha ao deletar pedido')
+      new BadRequestException('Falha ao deletar pedido'),
     );
 
     await expect(controller.delete(id)).rejects.toThrow(BadRequestException);
-    await expect(controller.delete(id)).rejects.toThrow('Falha ao deletar pedido');
+    await expect(controller.delete(id)).rejects.toThrow(
+      'Falha ao deletar pedido',
+    );
   });
 });

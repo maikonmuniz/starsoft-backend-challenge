@@ -6,11 +6,11 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
 
   const config = new DocumentBuilder()
-  .setTitle('Documentação')
-  .setDescription('Teste para empresa StartSoft')
-  .setVersion('1.0')
-  .addTag('Maikon')
-  .build();
+    .setTitle('Documentação')
+    .setDescription('Teste para empresa StartSoft')
+    .setVersion('1.0')
+    .addTag('Maikon')
+    .build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

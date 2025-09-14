@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { OrderService } from '../order.service';
@@ -55,51 +56,91 @@ describe('OrderService - register', () => {
   });
 
   it('should throw an exception if description is missing', async () => {
-    const orderData: Partial<Order> = { quantity:3 }
-    await expect(service.register(orderData)).rejects.toThrow(BadRequestException);
+    const orderData: Partial<Order> = { quantity: 3 };
     await expect(service.register(orderData)).rejects.toThrow(
-      'O parâmetro description é obrigatório'
+      BadRequestException,
+    );
+    await expect(service.register(orderData)).rejects.toThrow(
+      'O parâmetro description é obrigatório',
     );
   });
 
   it('should throw an exception if items is missing', async () => {
-    const orderData: Partial<Order> = {description: 'Test order', quantity: 1};
-    await expect(service.register(orderData)).rejects.toThrow(BadRequestException);
+    const orderData: Partial<Order> = {
+      description: 'Test order',
+      quantity: 1,
+    };
     await expect(service.register(orderData)).rejects.toThrow(
-      'O parâmetro items é obrigatório'
+      BadRequestException,
+    );
+    await expect(service.register(orderData)).rejects.toThrow(
+      'O parâmetro items é obrigatório',
     );
   });
 
   it('should throw an exception if quantity is missing', async () => {
-    const orderData: Partial<Order> = {description: 'Test order', items: [{ price: 30 }]};
-    await expect(service.register(orderData)).rejects.toThrow(BadRequestException);
+    const orderData: Partial<Order> = {
+      description: 'Test order',
+      items: [{ price: 30 }],
+    };
     await expect(service.register(orderData)).rejects.toThrow(
-      'O parâmetro quantity é obrigatório'
+      BadRequestException,
+    );
+    await expect(service.register(orderData)).rejects.toThrow(
+      'O parâmetro quantity é obrigatório',
     );
   });
 
-    it('should throw an error if quantity and items do not match', async () => {
-    const orderData: Partial<Order> = {description: 'Test order', items: [{ price: 30 }], quantity: 2};
-    await expect(service.register(orderData)).rejects.toThrow(BadRequestException);
+  it('should throw an error if quantity and items do not match', async () => {
+    const orderData: Partial<Order> = {
+      description: 'Test order',
+      items: [{ price: 30 }],
+      quantity: 2,
+    };
     await expect(service.register(orderData)).rejects.toThrow(
-      'Divergência na quantidade e nos itens!'
+      BadRequestException,
+    );
+    await expect(service.register(orderData)).rejects.toThrow(
+      'Divergência na quantidade e nos itens!',
     );
   });
 
   it('should throw an exception if save returns null', async () => {
-    const orderData: Partial<Order> = { description: 'Test order', items: [{ price: 30 }], quantity: 1 };
-    const orderEntity: Order = { id: 1, description: 'new order', items: [{ price: 30 }], quantity: 1 } as Order;
+    const orderData: Partial<Order> = {
+      description: 'Test order',
+      items: [{ price: 30 }],
+      quantity: 1,
+    };
+    const orderEntity: Order = {
+      id: 1,
+      description: 'new order',
+      items: [{ price: 30 }],
+      quantity: 1,
+    } as Order;
 
     repository.create.mockReturnValue(orderEntity);
     repository.save.mockResolvedValue(null as any);
 
-    await expect(service.register(orderData)).rejects.toThrow(BadRequestException);
-    await expect(service.register(orderData)).rejects.toThrow('No register in database!');
+    await expect(service.register(orderData)).rejects.toThrow(
+      BadRequestException,
+    );
+    await expect(service.register(orderData)).rejects.toThrow(
+      'No register in database!',
+    );
   });
 
   it('should create, save, emit Kafka event, and index in Elasticsearch', async () => {
-    const orderData: Partial<Order> = { description: 'Test order', items: [{ price: 30 }], quantity: 1 };
-    const orderEntity: Order = { id: 1, description: 'Test order', items: [{ price: 30 }], quantity: 1 } as Order;
+    const orderData: Partial<Order> = {
+      description: 'Test order',
+      items: [{ price: 30 }],
+      quantity: 1,
+    };
+    const orderEntity: Order = {
+      id: 1,
+      description: 'Test order',
+      items: [{ price: 30 }],
+      quantity: 1,
+    } as Order;
 
     repository.create.mockReturnValue(orderEntity);
     repository.save.mockResolvedValue(orderEntity);
@@ -110,7 +151,7 @@ describe('OrderService - register', () => {
     expect(repository.save).toHaveBeenCalledWith(orderEntity);
     expect(orderCreatedKafka.emit).toHaveBeenCalledWith(
       'orders',
-      JSON.stringify(orderEntity)
+      JSON.stringify(orderEntity),
     );
     expect(elasticsearchService.index).toHaveBeenCalledWith({
       index: 'orders',
