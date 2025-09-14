@@ -25,6 +25,32 @@ Todos os obejtivos foram implementados como:
 
 📖 Swagger (API Docs) → http://localhost:5050/api
 
+
+
+## Routes:
+
+
+```json
+{
+  "id": 123,
+  "name": "Pedido Teste",
+  "items": [
+    {
+      "id": 1,
+      "name": "Item A",
+      "quantity": 2
+    },
+    {
+      "id": 2,
+      "name": "Item B",
+      "quantity": 1
+    }
+  ],
+  "status": "pending"
+}
+```
+
+
 Executar testes com Jest:
 
 ```bash
