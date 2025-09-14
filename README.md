@@ -25,14 +25,17 @@ Todos os obejtivos foram implementados como:
 
 📖 Swagger (API Docs) → http://localhost:5050/api
 
-#!/bin/bash
-echo "🧪 Executando testes com Jest..."
+Executar testes com Jest:
+
+```bash
 yarn test
+```
+Acompanhar logs do Logstash em tempo real:
 
-#!/bin/bash
-echo "📜 Acompanhando logs do Logstash em tempo real..."
+```bash
 docker logs -f logstash
-
-#!/bin/bash
-echo "🚀 Subindo o projeto com Docker Compose..."
+```
+Subir o projeto com Docker Compose:
+```bash
 docker compose up
+```
