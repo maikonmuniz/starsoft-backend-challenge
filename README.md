@@ -5,7 +5,7 @@
 ### Obs...
 A .env será entrege à tech recruiter
 
-O unico empecilho do projeto é que foi colocado a senha do elasticSearch no arquivo de logstash... arquivo não reconhecia o valor da env, para que os logs fosse visto adicionei direto o valor.
+O unico empecilho do projeto é que foi colocado a senha do elasticSearch no arquivo de logstash... arquivo não reconhecia o valor da env, para que os logs fosse visto adicionei direto o valor (náo é uma boa pratica).
 
 ### Contexto
 
