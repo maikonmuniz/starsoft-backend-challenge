@@ -25,17 +25,14 @@ Todos os obejtivos foram implementados como:
 
 📖 Swagger (API Docs) → http://localhost:5050/api
 
-Execute os testes unitários com:
-
-```bash
+#!/bin/bash
+echo "🧪 Executando testes com Jest..."
 yarn test
 
-Acompanhar em tempo real com logstash:
-
-```bash
+#!/bin/bash
+echo "📜 Acompanhando logs do Logstash em tempo real..."
 docker logs -f logstash
 
-Executar o projeto:
-
-```bash
+#!/bin/bash
+echo "🚀 Subindo o projeto com Docker Compose..."
 docker compose up
