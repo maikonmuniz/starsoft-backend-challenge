@@ -29,27 +29,38 @@ Todos os obejtivos foram implementados como:
 
 ## Routes:
 
+endpoint de criação de pedidos.
 
+### post --> /order/create
 ```json
 {
-  "id": 123,
-  "name": "Pedido Teste",
+  "description": "Generate order",
   "items": [
     {
-      "id": 1,
-      "name": "Item A",
-      "quantity": 2
-    },
-    {
-      "id": 2,
-      "name": "Item B",
-      "quantity": 1
+      "price": 30
     }
   ],
-  "status": "pending"
+  "quantity": 1,
+  "status": "pendente"
 }
 ```
 
+Este endpoint de update serve para atualizar todos os campos de pedidos, consequentemente da para cancelar o pedido.
+
+### put --> /order/update
+```json
+{
+  "id": 1,
+  "description": "Generate order",
+  "items": [
+    {
+      "price": 30
+    }
+  ],
+  "quantity": 1,
+  "status": "processando"
+}
+```
 
 Executar testes com Jest:
 
