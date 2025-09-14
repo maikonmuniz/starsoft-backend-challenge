@@ -19,4 +19,15 @@ Todos os obejtivos foram implementados como:
 
 📈 Prometheus → http://localhost:9090
 
+🔍 Elasticsearch → http://localhost:5601/
+
+🔗 Kafka UI → http://localhost:8080
+
 📖 Swagger (API Docs) → http://localhost:5050/api
+
+## 🧪 Testes
+
+Execute os testes unitários com:
+
+```bash
+yarn test
