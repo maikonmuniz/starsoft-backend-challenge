@@ -28,16 +28,19 @@ export class OrderController {
   @ApiResponse({ status: 200, description: 'Retorna a consulta de pedido.' })
   @ApiQuery({ name: 'id', required: false, type: String })
   @ApiQuery({ name: 'status', required: false, type: String })
-  @ApiQuery({ name: 'data', required: false, type: String })
+  @ApiQuery({ name: 'date', required: false, type: String })
+  @ApiQuery({ name: 'quantity', required: false, type: Number })
   async find(
     @Query('id') id?: string,
     @Query('status') status?: string,
-    @Query('data') data?: string,
+    @Query('date') date?: string,
+    @Query('quantity') quantity?: number
   ) {
     return this.orderService.find(
       id,
       status,
-      data
+      date,
+      quantity
     );
   }
 
