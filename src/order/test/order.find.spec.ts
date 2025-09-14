@@ -1,6 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
-import { OrderService } from '../order.service'; // ajuste o path conforme sua estrutura
+import { OrderService } from '../order.service';
 import { Repository } from 'typeorm';
 import { Order } from '../../infra/database/order.entity';
 import { ClientKafka } from '@nestjs/microservices';
