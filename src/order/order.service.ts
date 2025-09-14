@@ -57,7 +57,7 @@ export class OrderService {
     return savedOrder;
   }
 
-  async find(id?: string, status?: string, data?: string) {
+  async find(id?: string, status?: string, date?: string, quantity?: number) {
     const filters: any[] = [];
 
     if (id) {
@@ -68,8 +68,12 @@ export class OrderService {
       filters.push({ term: { status: status } });
     }
 
-    if (data) {
-      filters.push({ range: { createdAt: { gte: data } } });
+    if (date) {
+      filters.push({ range: { createdAt: { gte: date } } });
+    }
+
+    if (quantity) {
+      filters.push({ term: { quantity: quantity } });
     }
 
     if (filters.length === 0) throw new BadRequestException("É necessário informar pelo menos um filtro (id, status ou data)!");
