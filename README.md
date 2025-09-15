@@ -2,6 +2,11 @@
 
 ## Bem-vindo(a) ao Projeto para o processo seletivo da StartSoft
 
+### Obs...
+A .env será entrege à tech recruiter
+
+O unico empecilho do projeto é que foi colocado a senha do elasticSearch no arquivo de logstash... arquivo não reconhecia o valor da env, para que os logs fossem vistos adicionei direto o valor, se tratando que não será utilizado para produção (náo é uma boa pratica).
+
 ### Contexto
 
 Todos os obejtivos foram implementados como:
